@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Categories | Jr. Reels</title>
+
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Schoolbell&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Schoolbell", cursive;
+        background: radial-gradient(circle at center, #14141f 20%, #0a0a12 90%);
+        color: white;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      /* Navigation Bar Styles */
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 28px;
+        background: transparent;
+      }
+      .left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      h1 {
+        font-family: "Schoolbell", cursive;
+        font-size: 26px;
+        color: aliceblue;
+        margin: 0;
+      }
+      .navbar .right a {
+        color: #d0d8e6;
+        text-decoration: none;
+        transition: color 0.15s;
+        font-size: 14px;
+      }
+      .search {
+        border: 1.5px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.02);
+        color: #fff;
+        width: 360px;
+        max-width: 45vw;
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        outline: none;
+      }
+      .right {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .profile {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .profile a i {
+        color: #000 !important;
+      }
+      .settings {
+        color: #fff;
+        cursor: pointer;
+      }
+
+      /* Category Section */
+      .categories {
+        padding: 40px 20px;
+        text-align: center;
+      }
+      .toggle {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 25px;
+        padding: 5px;
+        margin-bottom: 30px;
+      }
+      .toggle button {
+        background: none;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 20px;
+        transition: background 0.3s;
+      }
+      .toggle button.active {
+        background: #4a90e2;
+      }
+
+      /* --- CATEGORY BOXES GRID (For initial view) --- */
+      .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 30px;
+        padding: 0 60px;
+      }
+      .category-box {
+        border-radius: 20px;
+        height: 250px;
+        background-size: cover;
+        background-position: center;
+        cursor: pointer;
+        font-size: 22px;
+        font-weight: bold;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      /* 🌟 ADJUSTED: Make the overlay slightly more transparent 🌟 */
+      .category-box::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.25); /* Changed from 0.35 to 0.25 */
+        border-radius: 20px;
+      }
+      .category-box h2 {
+        position: relative;
+        z-index: 2;
+        top: 45%;
+      }
+      .category-box:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+      }
+
+      /* 🌟 MOVIE GRID STYLES (Enforcing 4 per row) 🌟 */
+      .movie-grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+        padding: 0 50px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .movie-card {
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 15px;
+        overflow: hidden;
+        width: 100%;
+        min-width: 150px;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+      }
+
+      .movie-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+      }
+
+      .movie-card img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 2 / 3;
+        object-fit: cover;
+        border-bottom: 2px solid #222;
+      }
+
+      .movie-title {
+        padding: 0.8rem;
+        font-family: "Schoolbell", cursive;
+        font-size: 1.05rem;
+        color: #fff;
+        background-color: rgba(0, 0, 0, 0.6);
+        border-radius: 0 0 15px 15px;
+      }
+
+      /* Media Query for responsiveness: Change to 2 columns on small screens */
+      @media (max-width: 800px) {
+        .movie-grid-container {
+          grid-template-columns: repeat(2, 1fr);
+          padding: 0 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="left">
+        <a href="homejr.html"><h1>Jr. Reels</h1></a>
+        <input
+          type="text"
+          class="search"
+          placeholder="Search for cartoons"
+          aria-label="Search cartoons"
+        />
+      </div>
+      <div class="right">
+        <a href="categories.html" aria-label="Categories">Categories</a>
+        <a href="#" aria-label="My favorites">My Favorites</a>
+        <div class="profile" title="Profile">
+          <a href="#" aria-label="Profile"><i class="fa-solid fa-user"></i></a>
+        </div>
+        <i class="fa-solid fa-gear settings" title="Settings"></i>
+      </div>
+    </div>
+
+    <section class="categories">
+      <div class="toggle">
+        <button id="genreBtn" class="active" onclick="toggleView('genre')">
+          Genre
+        </button>
+        <button id="ageBtn" onclick="toggleView('age')">Age</button>
+      </div>
+
+      <div class="category-grid" id="categoryGrid"></div>
+    </section>
+
+    <script>
+      const API_KEY = "038650abc5be23d9cb8e9f4803b5e2c9";
+
+      const genreCategories = [
+        {
+          name: "Animation",
+          img: "https://cdn.pixabay.com/photo/2022/09/12/14/09/cartoon-7449345_1280.jpg",
+        },
+        {
+          name: "Adventure",
+          img: "https://cdn.pixabay.com/photo/2020/04/15/15/06/cartoon-5046356_1280.jpg",
+        },
+        {
+          name: "Comedy",
+          img: "https://cdn.pixabay.com/photo/2020/03/30/15/45/funny-4983208_1280.jpg",
+        },
+        {
+          name: "Action",
+          img: "https://cdn.pixabay.com/photo/2018/03/12/22/37/superhero-3213067_1280.jpg",
+        },
+        {
+          name: "Family",
+          img: "https://cdn.pixabay.com/photo/2016/11/23/18/38/family-1850181_1280.png",
+        },
+      ];
+
+      const ageCategories = [
+        {
+          name: "Ages 2-5",
+          img: "https://cdn.pixabay.com/photo/2017/01/31/13/14/cartoon-2024192_1280.png",
+        },
+        {
+          name: "Ages 6-9",
+          img: "https://cdn.pixabay.com/photo/2021/12/30/16/34/cartoon-6903747_1280.jpg",
+        },
+        {
+          name: "Ages 10-13",
+          img: "https://cdn.pixabay.com/photo/2016/06/21/16/26/comics-1473413_1280.png",
+        },
+        {
+          name: "Ages 14-15",
+          img: "https://cdn.pixabay.com/photo/2022/06/02/17/10/cartoon-7239608_1280.jpg",
+        },
+      ];
+
+      const categoryGrid = document.getElementById("categoryGrid");
+
+      function toggleView(type) {
+        document.getElementById("genreBtn").classList.remove("active");
+        document.getElementById("ageBtn").classList.remove("active");
+        document.getElementById(type + "Btn").classList.add("active");
+        renderCategories(type);
+      }
+
+      function renderCategories(type) {
+        // When rendering categories, ensure we use the 'category-grid' class structure
+        categoryGrid.className = "category-grid";
+        categoryGrid.innerHTML = "";
+        const categories = type === "genre" ? genreCategories : ageCategories;
+        categories.forEach((cat) => {
+          const div = document.createElement("div");
+          div.classList.add("category-box");
+          div.style.backgroundImage = `url('${cat.img}')`;
+          div.innerHTML = `<h2>${cat.name}</h2>`;
+          div.onclick = () => loadMovies(type, cat.name);
+          categoryGrid.appendChild(div);
+        });
+      }
+
+      async function loadMovies(type, categoryName) {
+        // Clear the category grid area and add the movie title
+        categoryGrid.innerHTML = `<h2 style="grid-column: 1 / -1; color: #fff; font-size: 32px; margin-bottom: 20px;">${categoryName} Movies</h2>`;
+
+        // Add the new fixed-column container structure
+        const movieContainer = document.createElement("div");
+        movieContainer.className = "movie-grid-container";
+        categoryGrid.appendChild(movieContainer);
+
+        const genreMap = {
+          Animation: 16,
+          Adventure: 12,
+          Comedy: 35,
+          Action: 28,
+          Family: 10751,
+        };
+
+        let url = "";
+
+        if (type === "genre") {
+          url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreMap[categoryName]}&language=en-US&sort_by=popularity.desc`;
+        } else {
+          const certMap = {
+            "Ages 2-5": "G",
+            "Ages 6-9": "PG",
+            "Ages 10-13": "PG-13",
+            "Ages 14-15": "PG-13",
+          };
+          url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&certification_country=US&certification.lte=${certMap[categoryName]}&sort_by=popularity.desc&language=en-US`;
+        }
+
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (!data.results || data.results.length === 0) {
+            movieContainer.innerHTML = `<p style="grid-column: 1 / -1;">No movies found for ${categoryName}.</p>`;
+            return;
+          }
+
+          // Ensure the main grid element is styled for 4 columns
+          categoryGrid.className = "movie-list-wrapper";
+
+          data.results.slice(0, 12).forEach((movie) => {
+            if (!movie.poster_path) return;
+            const card = document.createElement("div");
+            card.classList.add("movie-card");
+            card.innerHTML = `
+              <div class="poster">
+                <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" />
+              </div>
+              <div class="movie-title">${movie.title}</div>
+            `;
+            card.onclick = () =>
+              (window.location.href = `movies.html?id=${movie.id}`);
+            movieContainer.appendChild(card); // Append to the 4-column container
+          });
+        } catch (err) {
+          console.error(err);
+          movieContainer.innerHTML = `<p style="grid-column: 1 / -1;">Error loading movies. Please try again later.</p>`;
+        }
+      }
+
+      // Default
+      renderCategories("genre");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Details | JuniorReels</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Schoolbell&family=Snippet&family=Bebas+Neue&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #000;
+        --secondary-color: #1a1a1a;
+        --accent-color: #4a90e2;
+        --safe-button-color: rgba(255, 255, 255, 0.1);
+        --text-light: #fff;
+        --text-muted: #ccc;
+      }
+      body {
+        margin: 0;
+        font-family: "Snippet", sans-serif;
+        background-color: var(--primary-color);
+        color: var(--text-light);
+      }
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 25px 50px;
+        background: transparent;
+        position: absolute;
+        width: 100%;
+        box-sizing: border-box;
+        z-index: 10;
+      }
+      .navbar h1 {
+        font-family: "Schoolbell", cursive;
+        font-size: 26px;
+        color: aliceblue;
+        margin: 0;
+      }
+      .navbar a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+        margin-left: 30px;
+      }
+
+      /* --- HERO SECTION: Full Viewport Height --- */
+      .movie-hero {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+      .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to top,
+          var(--primary-color) 0%,
+          rgba(0, 0, 0, 0.5) 20%,
+          rgba(0, 0, 0, 0.1) 40%,
+          transparent 100%
+        );
+        z-index: 1;
+      }
+
+      /* --- Text Container (The Hover Target) --- */
+      .hero-text-area {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 1200px;
+        padding: 0 50px;
+
+        /* PUSHED TITLE DOWN: Shift for initial state */
+        transform: translateY(120px);
+        transition: transform 0.5s ease;
+
+        margin-bottom: 20px;
+        cursor: default;
+      }
+      /* PULL TITLE UP ON HOVER: Final state */
+      .hero-text-area:hover {
+        transform: translateY(0);
+      }
+
+      /* FIX: Enforce Bebas Neue and size */
+      #movieTitle {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 75px; /* Increased size */
+        line-height: 1;
+        margin: 0;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      /* FIX: Enforce consistency and size */
+      .movie-subtitle {
+        font-size: 40px; /* Increased subtitle size */
+        margin-top: 5px;
+        line-height: 1;
+        color: var(--text-light);
+      }
+
+      /* --- HOVER DETAILS: Start Invisible and Shift Down --- */
+      .meta-box {
+        opacity: 0;
+        transition: opacity 0.3s ease 0.1s;
+        pointer-events: none;
+      }
+
+      .hero-text-area:hover .meta-box {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* FIX: Enforce consistent metadata font and size */
+      .meta-box p {
+        font-family: "Snippet", sans-serif;
+        font-size: 18px;
+        margin: 5px 0;
+      }
+      .meta-box .detail-label {
+        font-weight: bold;
+        color: var(--text-muted);
+        width: 80px;
+        display: inline-block;
+      }
+
+      /* --- NEW STORY/OVERVIEW STYLE --- */
+      .movie-story-wrapper {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        max-width: 700px;
+      }
+      /* FIX: Enforce consistent font for story */
+      .movie-story-wrapper p {
+        font-family: "Snippet", sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: var(--text-muted);
+        margin: 0;
+      }
+
+      /* --- BUTTON SECTION --- */
+      .button-section {
+        background-color: var(--primary-color);
+        padding: 20px 50px 50px 50px;
+        position: relative;
+        z-index: 100;
+      }
+      .button-group {
+        display: flex;
+        gap: 15px;
+      }
+      .action-button {
+        padding: 12px 25px;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s;
+        font-family: "Snippet", sans-serif;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .watch-button {
+        background-color: var(--accent-color);
+        color: var(--text-light);
+        border: none;
+      }
+      .safe-button {
+        background-color: var(--safe-button-color);
+        color: var(--text-light);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+      .action-button:hover {
+        transform: translateY(-1px);
+      }
+
+      /* --- ADDITIONAL CONTENT (Similar Movies) --- */
+      .additional-content {
+        padding: 0 50px 50px 50px;
+        background-color: var(--primary-color);
+        min-height: 20vh;
+      }
+      .additional-content h2 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 36px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+      }
+      .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 30px;
+      }
+
+      /* --- RELATED MOVIE CARDS (Modern & Clean Style) --- */
+      .related-movie-card {
+        text-decoration: none;
+        color: var(--text-light);
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        overflow: hidden;
+        border-radius: 8px;
+        background-color: var(--secondary-color);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .related-movie-card:hover {
+        transform: scale(1.05) translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      }
+
+      .related-movie-card img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        display: block;
+        border-radius: 8px 8px 0 0;
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .related-movie-card:hover img {
+        transform: scale(1.02);
+      }
+
+      .related-movie-card p {
+        margin-top: 10px;
+        font-size: 16px;
+        text-align: center;
+        padding: 10px 5px;
+        line-height: 1.2;
+        background-color: var(--secondary-color);
+        border-radius: 0 0 8px 8px;
+        font-weight: bold;
+      }
+
+      /* --- SAFETY MODAL STYLES (FROM PREVIOUS STEP) --- */
+      .safety-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .safety-box {
+        background: linear-gradient(135deg, #1f2a3a, #141e30);
+        border-radius: 15px;
+        width: 90%;
+        max-width: 650px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        color: var(--text-light);
+        font-family: "Snippet", sans-serif;
+      }
+      .safety-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 25px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: #0d121c;
+      }
+      .safety-header h2 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 30px;
+        margin: 0;
+      }
+      .close-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 30px;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      .close-btn:hover {
+        color: var(--text-light);
+      }
+      .safety-content {
+        padding: 30px 25px;
+      }
+      .score-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+      .score-meter {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: #333;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+      .score-fill {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        transition: height 1s ease-out, background-color 0.5s;
+        height: 0;
+      }
+      .safety-good {
+        background-color: #4caf50;
+      }
+      .safety-medium {
+        background-color: #ffc107;
+      }
+      .safety-poor {
+        background-color: #f44336;
+      }
+      .score-text {
+        position: relative;
+        z-index: 2;
+        font-size: 36px;
+        font-weight: bold;
+        color: var(--text-light);
+        mix-blend-mode: difference;
+      }
+      .score-label {
+        margin-top: 10px;
+        font-size: 16px;
+        color: var(--text-muted);
+      }
+      .summary-text {
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .warning-section {
+        text-align: center;
+        margin-top: 20px;
+      }
+      .warning-button {
+        background-color: #d32f2f;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background-color 0.2s;
+      }
+      .warning-button:hover {
+        background-color: #c62828;
+      }
+      .warning-details {
+        background-color: #1f2a3a;
+        border: 1px solid #d32f2f;
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 8px;
+        text-align: left;
+        font-style: italic;
+        color: #ffdddd;
+      }
+      .recommendation-text {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        font-size: 16px;
+        text-align: center;
+        font-weight: bold;
+        color: #4a90e2;
+      }
+
+      /* --- VIDSRC EMBED PLAYER STYLES --- */
+      .video-modal-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.98);
+        z-index: 5000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .video-modal-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+      .close-player-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #d32f2f;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        z-index: 5001;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="left">
+        <a href="homejr.html"><h1>Jr. Reels</h1></a>
+      </div>
+
+      <div class="right">
+        <a href="cat.html">Categories</a>
+        <a href="#">My Favorites</a>
+      </div>
+    </div>
+
+    <div id="movieHero" class="movie-hero">
+      <div class="overlay"></div>
+
+      <div id="heroTextArea" class="hero-text-area">
+        <div id="loadingText" class="loading-text">
+          Loading movie details...
+        </div>
+      </div>
+    </div>
+
+    <div id="buttonSection" class="button-section"></div>
+
+    <div
+      id="additionalContent"
+      class="additional-content"
+      style="display: none"
+    >
+      <h2>More Awesome Reels</h2>
+
+      <div id="similarMoviesGrid" class="movie-grid"></div>
+    </div>
+
+    <div id="safetyModal" class="safety-modal-overlay">
+      <div class="safety-box">
+        <div class="safety-header">
+          <h2 id="safetyTitle">Safety Report: Movie Title</h2>
+          <button
+            class="close-btn"
+            onclick="document.getElementById('safetyModal').style.display='none';"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="safety-content">
+          <div class="score-container">
+            <div id="scoreMeter" class="score-meter" data-score="0">
+              <div id="scoreFill" class="score-fill"></div>
+              <span id="scoreText" class="score-text">0 / 100</span>
+            </div>
+            <p class="score-label">Kids' Safety Score</p>
+          </div>
+          <div id="safetySummary" class="summary-text"></div>
+
+          <div id="warningArea" class="warning-section" style="display: none">
+            <button
+              id="warningButton"
+              class="warning-button"
+              onclick="document.getElementById('warningDetails').style.display='block';"
+            >
+              ⚠️ Know more about the Problems in the movie..
+            </button>
+            <div
+              id="warningDetails"
+              class="warning-details"
+              style="display: none"
+            >
+              <p id="advisoryNotes"></p>
+            </div>
+          </div>
+
+          <div id="safetyRecommendation" class="recommendation-text"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API_KEY = "038650abc5be23d9cb8e9f4803b5e2c9";
+      const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/";
+
+      const movieHero = document.getElementById("movieHero");
+      const heroTextArea = document.getElementById("heroTextArea");
+      const buttonSection = document.getElementById("buttonSection");
+      const similarMoviesGrid = document.getElementById("similarMoviesGrid");
+      const additionalContent = document.getElementById("additionalContent");
+
+      function getMovieIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("id");
+      }
+
+      function formatRuntime(minutes) {
+        if (!minutes || minutes === 0) return "N/A";
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        let result = [];
+        if (hours > 0) result.push(`${hours}h`);
+        if (mins > 0) result.push(`${mins}m`);
+        return result.length > 0 ? result.join(" ") : "N/A";
+      }
+
+      function createRelatedMovieCard(movie) {
+        const card = document.createElement("a");
+        card.href = `movies.html?id=${movie.id}`;
+        card.classList.add("related-movie-card");
+
+        const imageUrl = movie.poster_path
+          ? `${IMAGE_BASE_URL}w342${movie.poster_path}`
+          : "placeholder.jpg";
+
+        card.innerHTML = `
+        <img src="${imageUrl}" alt="${movie.title} Poster">
+        <p>${movie.title}</p>
+      `;
+
+        card.addEventListener("click", (e) => {
+          e.preventDefault();
+          window.location.href = card.href;
+        });
+
+        return card;
+      }
+
+      async function fetchAndRenderMainMovie(movieId) {
+        const movieUrl = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=en-US&append_to_response=releases,genres`;
+
+        try {
+          const res = await fetch(movieUrl);
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(
+              errorData.status_message || "Movie not found or API error."
+            );
+          }
+          const movie = await res.json();
+
+          // Set Background
+          if (movie.backdrop_path) {
+            movieHero.style.backgroundImage = `url('${IMAGE_BASE_URL}w1280${movie.backdrop_path}')`;
+          } else {
+            movieHero.style.backgroundImage = "none";
+            movieHero.style.backgroundColor = "var(--primary-color)";
+          }
+
+          // Extract Details
+          const usRelease = movie.releases?.countries.find(
+            (c) => c.iso_3166_1 === "US"
+          );
+          const certification = usRelease?.certification || "N/A";
+          const genres = movie.genres.map((g) => g.name).join(", ");
+
+          document.title = `${movie.title} | JuniorReels`;
+
+          // --- 1. TITLE SPLIT LOGIC ---
+          let titleHtml = "";
+          const separatorIndex = Math.max(
+            movie.title.indexOf(":"),
+            movie.title.indexOf("—")
+          );
+
+          if (separatorIndex !== -1) {
+            const mainTitle = movie.title.substring(0, separatorIndex).trim();
+            const subTitle = movie.title.substring(separatorIndex + 1).trim();
+
+            titleHtml = `
+              <h2 id="movieTitle">
+                <span>${mainTitle}</span>
+                <span class="movie-subtitle">${subTitle}</span>
+              </h2>
+            `;
+          } else {
+            titleHtml = `<h2 id="movieTitle"><span>${movie.title}</span></h2>`;
+          }
+
+          // --- 2. RENDER TITLE AND HOVER DETAILS ---
+          heroTextArea.innerHTML = `
+            ${titleHtml}
+            
+            <div class="meta-box">
+                <p>
+                    <span class="detail-label">Ratings:</span> ⭐ ${
+                      movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"
+                    } / 10
+                </p>
+                <p>
+                    <span class="detail-label">Year:</span> ${
+                      movie.release_date
+                        ? movie.release_date.substring(0, 4)
+                        : "N/A"
+                    }
+                </p>
+                <p>
+                    <span class="detail-label">Runtime:</span> ${formatRuntime(
+                      movie.runtime
+                    )}
+                </p>
+                <p>
+                    <span class="detail-label">Genre:</span> ${genres || "N/A"}
+                </p>
+                <div class="movie-story-wrapper">
+                    <p>
+                        ${movie.overview || "No story details available."}
+                    </p>
+                </div>
+            </div>
+          `;
+
+          // Get the movie title for the 'Watch Now' button
+          const currentMovieId = movie.id;
+          const currentMovieTitle = movie.title;
+
+          // --- 3. RENDER BUTTONS IN SEPARATE SECTION ---
+          buttonSection.innerHTML = `
+            <div class="button-group">
+                <button class="action-button watch-button" id="watchNowButton" 
+                  onclick="findAndOpenMovieLink('${currentMovieTitle.replace(
+                    /'/g,
+                    "\\'"
+                  )}')">
+                    Watch Now
+                </button>
+                <button class="action-button safe-button" id="safetyCheckButton" 
+                    onclick="runSafetyCheck(${currentMovieId}, '${currentMovieTitle.replace(
+            /'/g,
+            "\\'"
+          )}')">
+                    Is this Safe for Me?
+                </button>
+            </div>
+          `;
+        } catch (e) {
+          console.error("Fetch Main Movie Error:", e);
+          heroTextArea.innerHTML = `<div class="loading-text">Error: Could not load movie details. (${
+            e.message || "Network Error"
+          })</div>`;
+          buttonSection.innerHTML = "";
+        }
+      }
+
+      // LIST OF KID-FRIENDLY GENRE IDs (Whitelisted)
+      const KID_SAFE_GENRE_IDS = [16, 10751, 12, 14, 878];
+      const EXCLUDED_GENRE_IDS = [10749, 27, 53, 80];
+      const ADULT_KEYWORDS =
+        /sex|kill|murder|erotic|violence|blood|thrill|crime|drug|mafia/i;
+
+      async function fetchAndRenderSimilarMovies(movieId) {
+        const similarUrl = `https://api.themoviedb.org/3/movie/${movieId}/similar?api_key=${API_KEY}&language=en-US`;
+
+        try {
+          const res = await fetch(similarUrl);
+          const data = await res.json();
+
+          let filteredSimilarMovies = data.results
+            .filter((m) => m.poster_path)
+            .filter((m) => m.adult !== true)
+            .filter((m) => {
+              if (!m.genre_ids || m.genre_ids.length === 0) return false;
+              if (m.genre_ids.some((id) => EXCLUDED_GENRE_IDS.includes(id))) {
+                return false;
+              }
+              const textToCheck = `${m.title} ${m.overview || ""}`;
+              if (ADULT_KEYWORDS.test(textToCheck)) {
+                return false;
+              }
+              return m.genre_ids.some((id) => KID_SAFE_GENRE_IDS.includes(id));
+            });
+
+          filteredSimilarMovies.sort((a, b) => {
+            const dateA = a.release_date
+              ? new Date(a.release_date)
+              : new Date(0);
+            const dateB = b.release_date
+              ? new Date(b.release_date)
+              : new Date(0);
+            return dateB - dateA;
+          });
+
+          filteredSimilarMovies = filteredSimilarMovies.slice(0, 8);
+
+          if (filteredSimilarMovies.length > 0) {
+            similarMoviesGrid.innerHTML = "";
+            filteredSimilarMovies.forEach((movie) => {
+              similarMoviesGrid.appendChild(createRelatedMovieCard(movie));
+            });
+            additionalContent.style.display = "block";
+          } else {
+            additionalContent.style.display = "none";
+          }
+        } catch (e) {
+          console.error("Fetch Similar Movies Error:", e);
+          additionalContent.style.display = "none";
+        }
+      }
+
+      async function loadMovieDetails() {
+        const movieId = getMovieIdFromUrl();
+
+        if (!movieId) {
+          heroTextArea.innerHTML = `<div class="loading-text">Error: No movie ID found in URL.</div>`;
+          return;
+        }
+
+        await fetchAndRenderMainMovie(movieId);
+        await fetchAndRenderSimilarMovies(movieId);
+      }
+
+      loadMovieDetails();
+
+      function findAndOpenMovieLink(title) {
+        const watchNowButton = document.getElementById("watchNowButton");
+        const movieId = getMovieIdFromUrl();
+
+        if (!movieId) {
+          alert("Error: Cannot start streaming. Movie ID is missing.");
+          return;
+        }
+
+        if (watchNowButton) {
+          watchNowButton.textContent = "Loading Player...";
+          watchNowButton.disabled = true;
+        }
+
+        // ✅ Dynamic URL using movieId
+        const streamingUrl = `https://vidsrc.icu/embed/movie/${movieId}`;
+
+        // Remove old player if any
+        const existingPlayer = document.getElementById("videoPlayerContainer");
+        if (existingPlayer) existingPlayer.remove();
+
+        // Create container
+        const playerContainer = document.createElement("div");
+        playerContainer.id = "videoPlayerContainer";
+        playerContainer.className = "video-modal-container";
+
+        // ✅ Embed the correct movie dynamically
+        playerContainer.innerHTML = `
+    <iframe
+      src="${streamingUrl}"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+      referrerpolicy="no-referrer"
+      style="width: 100%; height: 70vh; border: none; border-radius: 12px;"
+    ></iframe>
+
+    <button class="close-player-btn" onclick="document.getElementById('videoPlayerContainer').remove()">
+      &times; CLOSE PLAYER
+    </button>
+  `;
+
+        document.body.appendChild(playerContainer);
+
+        setTimeout(() => {
+          if (watchNowButton) {
+            watchNowButton.textContent = "Watch Now (Instant Stream)";
+            watchNowButton.disabled = false;
+          }
+        }, 1500);
+      }
+
+      // This is the function that handles the safety modal display
+      async function runSafetyCheck(movieId, movieTitle) {
+        const safetyButton = document.getElementById("safetyCheckButton");
+        const safetyModal = document.getElementById("safetyModal");
+        const scoreFill = document.getElementById("scoreFill");
+        const scoreText = document.getElementById("scoreText");
+        const safetyTitle = document.getElementById("safetyTitle");
+        const safetySummary = document.getElementById("safetySummary");
+        const warningArea = document.getElementById("warningArea");
+        const warningDetails = document.getElementById("warningDetails");
+        const advisoryNotes = document.getElementById("advisoryNotes");
+        const safetyRecommendation = document.getElementById(
+          "safetyRecommendation"
+        );
+
+        if (safetyButton) safetyButton.textContent = "Scanning...";
+
+        safetyModal.style.display = "flex";
+
+        // Reset previous state
+        scoreFill.style.height = "0%";
+        scoreFill.className = "score-fill";
+        scoreText.textContent = "... / 100";
+        warningArea.style.display = "none";
+        warningDetails.style.display = "none";
+        safetySummary.textContent = "Connecting to Safety Scanner...";
+        safetyRecommendation.textContent = "";
+
+        const BACKEND_URL = `http://localhost:3000/api/safety-check/${movieId}`;
+
+        try {
+          const response = await fetch(BACKEND_URL);
+          const data = await response.json();
+
+          if (response.status !== 200) {
+            throw new Error(data.error || "Server returned an error.");
+          }
+
+          const report = data;
+          const score = report.normalizedScore || 100;
+          const scoreHeight = Math.max(0, Math.min(100, score));
+
+          let colorClass;
+          if (score >= 80) colorClass = "safety-good";
+          else if (score >= 50) colorClass = "safety-medium";
+          else colorClass = "safety-poor";
+
+          // --- Render Data ---
+          safetyTitle.textContent = `Safety Report: ${
+            report.movieTitle || movieTitle
+          }`;
+          scoreText.textContent = `${score} / 100`;
+          safetySummary.textContent = report.summary;
+          safetyRecommendation.textContent = `Recommendation: ${report.recommendation}`;
+
+          scoreFill.style.height = `${scoreHeight}%`;
+          scoreFill.classList.add(colorClass);
+
+          // --- Handle Warnings ---
+          if (report.advisoryNotes && report.advisoryNotes.length > 0) {
+            warningArea.style.display = "block";
+            advisoryNotes.innerHTML = report.advisoryNotes
+              .map((note) => `<li>${note}</li>`)
+              .join("");
+            // Keep details hidden initially
+            warningDetails.style.display = "none";
+          } else {
+            warningArea.style.display = "none";
+          }
+        } catch (e) {
+          console.error("Safety Check Error:", e);
+          safetyTitle.textContent = "Safety Scan Failed";
+          safetySummary.textContent = `Could not connect to the safety server. Error: ${e.message}.`;
+          scoreText.textContent = "N/A";
+          scoreFill.style.height = "100%";
+          scoreFill.classList.add("safety-poor");
+          warningArea.style.display = "none";
+          safetyRecommendation.textContent =
+            "Please ensure your Node.js server is running.";
+        } finally {
+          if (safetyButton) safetyButton.textContent = "Is this Safe for Me?";
+        }
+      }
+    </script>
+  </body>
+</html>
