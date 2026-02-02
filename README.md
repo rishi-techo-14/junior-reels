@@ -106,7 +106,7 @@ OMDb API
 ![Categories 4](assets/categories_page/cat4.png)
 
 ### Search Feature
-![Search Feature](assets/search_page/search_page.png)
+![Search Feature](assets/search_page.png)
 
 ---
 
